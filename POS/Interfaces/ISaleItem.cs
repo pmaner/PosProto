@@ -1,6 +1,9 @@
 ﻿using System;
 namespace POS.Interfaces
 {
+    /// <summary>
+    /// Interface so I can use the SaleItem and my viewmodel interchangebly
+    /// </summary>
     public interface ISaleItem
     {
 

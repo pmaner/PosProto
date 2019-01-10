@@ -7,7 +7,9 @@ using POS.Models;
 
 namespace POS.Services
 {
-
+    /// <summary>
+    /// Just habbit making DataStores, would communicate with the backend
+    /// </summary>
     public class MockTransactionDataStore : IDataStore<ISaleItem>
     {
         List<ISaleItem> _items;

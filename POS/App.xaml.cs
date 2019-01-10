@@ -17,6 +17,10 @@ namespace POS
         {
             InitializeComponent();
 
+            // /////////////////////////
+            // Some services we will use
+            // As it just a mockup with dont really need them but real apps do
+            // so I throught I would put in some mock ones
             if (UseMockDataStore)
             {
                 DependencyService.Register<MockProductDataStore>();

@@ -25,5 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Converters\BooleanToVisibilityConverter.cs" />
+    <Compile Remove="Services\NotifyTaskCompletion.cs" />
   </ItemGroup>
 </Project>

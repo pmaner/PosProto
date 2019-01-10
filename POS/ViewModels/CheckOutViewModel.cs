@@ -23,7 +23,7 @@ namespace POS.ViewModels
         public ICommand SetDiscountCommand { get; }
         public ICommand EditDiscountCommand { get; }
 
-        public BindingList<SaleItemViewModel> Cart { get; }
+        public BindingList<ISaleItem> Cart { get; }
         public decimal CartTotal => Cart.Sum(item => item.TotalPrice);
 
 
@@ -49,7 +49,7 @@ namespace POS.ViewModels
 
         public CheckOutViewModel()
         {
-            Cart = new BindingList<SaleItemViewModel>();
+            Cart = new BindingList<ISaleItem>();
 
             // should be handled better if it is really a long service call
             foreach (var item in TransactionDataStore.GetItemsAsync().Result)

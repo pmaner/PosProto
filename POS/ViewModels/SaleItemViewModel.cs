@@ -4,6 +4,9 @@ using POS.Models;
 
 namespace POS.ViewModels
 {
+    /// <summary>
+    /// View Model that wrapps the SaleItem so the model code is not polluted by binding plumbing
+    /// </summary>
     public class SaleItemViewModel : ViewModelBase, ISaleItem
     {
         private ISaleItem _item;

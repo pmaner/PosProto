@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 
 namespace POS.ViewModels
 {
+    /// <summary>
+    /// General notification implementation
+    /// </summary>
     public class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
