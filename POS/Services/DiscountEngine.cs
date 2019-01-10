@@ -28,71 +28,34 @@ namespace POS.Services
             // reset the discount
             foreach (var item in items)
                 item.Discount = 0M;
-
-            var totalDiscount = totalPrice - salePrice;
-            var discountPercent = (totalDiscount / totalPrice);
-            var localItems = new List<ISaleItem>(items);
-            var totalUnappliedDiscount = 0M;
+                
+            var remainingDiscountableItems = new List<ISaleItem>(items);
+            var totalUnappliedDiscount = totalPrice - salePrice;
 
             // Discount items based on percentage of the sale they unit price
             // of each item represents
-            for (int index = localItems.Count - 1; index >= 0; index--)
+            do
             {
-                var item = localItems[index];
+                totalPrice = remainingDiscountableItems.Sum(i => i.TotalPrice);
+                var discountPercent = totalUnappliedDiscount / totalPrice;
+                totalUnappliedDiscount = DiscountRemainingItems(remainingDiscountableItems, products, discountPercent);
+            } while ((remainingDiscountableItems.Count > 0) && (totalUnappliedDiscount > 0));
 
-                var minPrice = MinPrice(item, products);
-                // perhaps should have something more complicated to account for the fractions of a cent,
-                // it will just be rounded at output currently
-                var unappliedDiscount = ApplyDiscount(item, minPrice, Math.Round(item.UnitPrice * discountPercent * item.Quantity, 2));
-                if (unappliedDiscount > 0) // reached full discount, so can discount any more
-                {
-                    localItems.Remove(item);
-                    totalUnappliedDiscount += unappliedDiscount;
-                }
-            }
-
-            // Apply discount that could be applied to others in 
-            // even amount based of the quanity
-            if (totalUnappliedDiscount > 0)
-            {
-                do
-                {
-                    totalPrice = localItems.Sum(i => i.TotalPrice);
-                    discountPercent = totalUnappliedDiscount / totalPrice;
-                    //var perItemDiscount = totalUnappliedDiscount / localItems.Sum(i => i.Quantity);
-                    totalUnappliedDiscount = 0; // start from scratch on what is not applied
-                    for (int index = localItems.Count - 1; index >= 0; index--)
-                    {
-                        var item = localItems[index];
-
-                        var minPrice = MinPrice(item, products);
-                        // perhaps should have something more complicated to account for the fractions of a cent,
-                        // it will just be rounded at output currently
-                        var unitPrice = item.TotalPrice / item.Quantity;
-                        var unappliedDiscount = ApplyDiscount(item, minPrice, Math.Round(unitPrice * discountPercent * item.Quantity, 2));
-                        if (unappliedDiscount > 0) // reached full discount, so can discount any more
-                        {
-                            localItems.Remove(item);
-                            totalUnappliedDiscount += unappliedDiscount;
-                        }
-                    }
-                } while ((localItems.Count > 0) && (totalUnappliedDiscount > 0));
-            }
 
             // Everything is fully discounted do a sanity check for rounding errors
             var newTotal = items.Sum(i => i.TotalPrice);
             if (salePrice < newTotal) // 
             {
-                if (localItems.Count == 0)
+                if (remainingDiscountableItems.Count == 0)
                     return;
                 var error = newTotal-salePrice;
-                var largestUndiscountedItem = localItems.OrderBy(x => x.TotalPrice).Last();
+                var largestUndiscountedItem = remainingDiscountableItems.OrderBy(x => x.TotalPrice).Last();
                 largestUndiscountedItem.Discount += error;
             }
         }
 
 
-        private decimal DiscountItems(IList<ISaleItem> items, IList<Product> products, decimal discountPercent)
+        private decimal DiscountRemainingItems(IList<ISaleItem> items, IList<Product> products, decimal discountPercent)
         {
             var totalUnappliedDiscount = 0M;
 
@@ -101,12 +64,10 @@ namespace POS.Services
             for (int index = items.Count - 1; index >= 0; index--)
             {
                 var item = items[index];
-
                 var minPrice = MinPrice(item, products);
-                // perhaps should have something more complicated to account for the fractions of a cent,
-                // it will just be rounded at output currently
-                var unappliedDiscount = ApplyDiscount(item, minPrice, Math.Round(item.UnitPrice * discountPercent * item.Quantity, 2));
-                if (unappliedDiscount > 0) // reached full discount, so can discount any more
+                var unitPrice = item.TotalPrice / item.Quantity; // unit price has changed after first discount pass
+                var unappliedDiscount = ApplyDiscount(item, minPrice, Math.Round(unitPrice * discountPercent * item.Quantity, 2));
+                if (unappliedDiscount > 0) // reached full discount, so cant discount any more
                 {
                     items.Remove(item);
                     totalUnappliedDiscount += unappliedDiscount;
