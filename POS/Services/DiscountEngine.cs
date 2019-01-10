@@ -6,6 +6,11 @@ using POS.Models;
 
 namespace POS.Services
 {
+    /// <summary>
+    /// Encapsulates the logic for discounting. I would imangine in a real system this would be
+    /// some type of chain of responsibility pattern as you will have different discounting algorithms
+    /// that will be able to be applied and probably configured by users.
+    /// </summary>
     public class DiscountEngine
     {
         public DiscountEngine()
@@ -13,24 +18,35 @@ namespace POS.Services
         }
 
         /// <summary>
+        /// Discount the specified items, products and salePrice.
         /// Better to have the discount engine keep a cache of the products that have be purchased
         /// as in most shops there are lots of products, but not all get purchased often
-        ///      Item Discount = Item Quantity * Item Unit Price * Total Discount/<paramref name="totalPrice"/>
+        ///      Item Discount = Item Quantity * Item Unit Price * Total Discount/salePrice
         /// </summary>
-        /// <param name="items">Items.</param>
-        /// <param name="products">Products.</param>
-        /// <param name="totalDiscount">Total discount.</param>
-        public void Discount(IList<ISaleItem> items, IList<Product> products, decimal totalPrice, decimal salePrice)
+        /// <returns>The modifed list of items that has been discounted</returns>
+        /// <param name="items">Items to be discounted, these are changed</param>
+        /// <param name="products">Products with minium pricing</param>
+        /// <param name="salePrice">Sale price.</param>
+        public IList<ISaleItem> Discount(IList<ISaleItem> items, IList<Product> products, decimal salePrice)
         {
-            if (salePrice > totalPrice) // cant make it more expensive
-                return;
+            // As you asked for the function to return the list of Sale Items I have returned the list passed in
+            // if you really want new object I can put a clone method in to recreate all the object, but this
+            // will mess a bit with the binding of the objects in the list so I have modifed them in place and
+            // just returned the same list of sale items
 
             // reset the discount
             foreach (var item in items)
                 item.Discount = 0M;
+
+            if (salePrice <= 0) // cant give money away
+                return items;
                 
             var remainingDiscountableItems = new List<ISaleItem>(items);
+            var totalPrice = remainingDiscountableItems.Sum(i => i.TotalPrice);
             var totalUnappliedDiscount = totalPrice - salePrice;
+
+            if (totalPrice < salePrice) // dont put prices up
+                return items;
 
             // Discount items based on percentage of the sale they unit price
             // of each item represents
@@ -47,15 +63,25 @@ namespace POS.Services
             if (salePrice < newTotal) // 
             {
                 if (remainingDiscountableItems.Count == 0)
-                    return;
+                    return items;
                 var error = newTotal-salePrice;
                 var largestUndiscountedItem = remainingDiscountableItems.OrderBy(x => x.TotalPrice).Last();
                 largestUndiscountedItem.Discount += error;
             }
+
+            return items;
         }
 
-
-        private decimal DiscountRemainingItems(IList<ISaleItem> items, IList<Product> products, decimal discountPercent)
+        /// <summary>
+        /// Loop through the items and apply the discount up until the limit is reached
+        /// sale items that have reached their maximum discount are removed from the items list
+        /// to avoid future processing
+        /// </summary>
+        /// <returns>the unapplied portion of the discount</returns>
+        /// <param name="items">Items.</param>
+        /// <param name="products">Products.</param>
+        /// <param name="discountPercent">Discount percent.</param>
+        static private decimal DiscountRemainingItems(IList<ISaleItem> items, IList<Product> products, decimal discountPercent)
         {
             var totalUnappliedDiscount = 0M;
 
@@ -83,7 +109,7 @@ namespace POS.Services
         /// <returns>The price.</returns>
         /// <param name="item">Item.</param>
         /// <param name="products">Products.</param>
-        private decimal MinPrice (ISaleItem item, IList<Product> products)
+        static private decimal MinPrice (ISaleItem item, IList<Product> products)
         {
             var product = products.FirstOrDefault(p => p.ProductId == item.ProductId);
             //if (product == null)
@@ -100,7 +126,7 @@ namespace POS.Services
         /// <returns>the unapplied portion of the discount</returns>
         /// <param name="item">Item.</param>
         /// <param name="discount">Discount for whole sale item</param>
-        private decimal ApplyDiscount(ISaleItem item, decimal minPrice, decimal discount)
+        static private decimal ApplyDiscount(ISaleItem item, decimal minPrice, decimal discount)
         {
             var discountToApply = Math.Min(discount, (item.UnitPrice - minPrice)*item.Quantity);
             item.Discount += discountToApply;

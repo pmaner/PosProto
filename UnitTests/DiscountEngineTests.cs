@@ -29,7 +29,7 @@ namespace UnitTests
 
             var totalBeforeDiscount = transactions.Sum(i => i.TotalPrice);
 
-            discountEngine.Discount(transactions, products, totalBeforeDiscount, totalBeforeDiscount);
+            discountEngine.Discount(transactions, products, totalBeforeDiscount);
 
             var totalAfterDiscount = transactions.Sum(i => i.TotalPrice);
 
@@ -44,7 +44,7 @@ namespace UnitTests
             var products = MockProductDataStore.CreateNoMinimumsProducts();
             var paid = 10M;
 
-            discountEngine.Discount(transactions, products, KnownTestTotal, paid);
+            discountEngine.Discount(transactions, products, paid);
 
             var totalAfterDiscount = transactions.Sum(i => i.TotalPrice);
 
@@ -63,7 +63,7 @@ namespace UnitTests
             var products = MockProductDataStore.CreateSimpleMinimumsProducts();
             var paid = 10M;
 
-            discountEngine.Discount(transactions, products, KnownTestTotal, paid);
+            discountEngine.Discount(transactions, products, paid);
 
             var totalAfterDiscount = transactions.Sum(i => i.TotalPrice);
 
@@ -82,7 +82,7 @@ namespace UnitTests
             var products = MockProductDataStore.CreateNoMinimumsProducts();
             var paid = 10.23M;
 
-            discountEngine.Discount(transactions, products, KnownTestTotal, paid);
+            discountEngine.Discount(transactions, products, paid);
 
             var totalAfterDiscount = transactions.Sum(i => i.TotalPrice);
 
@@ -92,5 +92,26 @@ namespace UnitTests
             Assert.Equal(1.79M, Math.Round(transactions[1].Discount, 2));
             Assert.Equal(2.15M, Math.Round(transactions[2].Discount, 2));
         }
+
+        [Fact]
+        public void DiscountWithAllMinimumsSetShouldNotSellAtLoss()
+        {
+            var discountEngine = new DiscountEngine();
+            var transactions = MockTransactionDataStore.CreateTestSale();
+            var products = MockProductDataStore.CreateAllMinimumsProducts();
+            var paid = 10M;
+            var expected = 12.5M;
+
+            discountEngine.Discount(transactions, products, paid);
+
+            var totalAfterDiscount = transactions.Sum(i => i.TotalPrice);
+
+            Assert.Equal(expected, Math.Round(totalAfterDiscount, 2));
+
+            Assert.Equal(0.25M, Math.Round(transactions[0].Discount, 2));
+            Assert.Equal(0.90M, Math.Round(transactions[1].Discount, 2));
+            Assert.Equal(1.05M, Math.Round(transactions[2].Discount, 2));
+        }
+
     }
 }

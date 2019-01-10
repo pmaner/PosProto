@@ -48,6 +48,17 @@ namespace POS.Services
             return mockItems;
         }
 
+        public static IList<Product> CreateAllMinimumsProducts()
+        {
+            var mockItems = new List<Product>
+            {
+                new Product() { ProductId = 1,  MinimumPrice = 1.5M }, // Widget
+                new Product() { ProductId = 2,  MinimumPrice = 2.50M }, // Gadget
+                new Product() { ProductId = 3,  MinimumPrice = 2M }, // Gizmo
+            };
+            return mockItems;
+        }
+
         public async Task<bool> AddItemAsync(Product item)
         {
             _items.Add(item);

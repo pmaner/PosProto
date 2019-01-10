@@ -18,25 +18,38 @@
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <Button Text="State 1" Grid.Column="0" HorizontalOptions="FillAndExpand" Command="{Binding State1Command}"/>
-            <Button Text="State 2" Grid.Column="1" HorizontalOptions="FillAndExpand" Command="{Binding State2Command}"/>
-            <Button Text="State 3" Grid.Column="2" HorizontalOptions="FillAndExpand" Command="{Binding State3Command}"/>          
+            <Button Text="No Mins" Grid.Column="0" HorizontalOptions="FillAndExpand" Command="{Binding State1Command}"/>
+            <Button Text="Gadget Min" Grid.Column="1" HorizontalOptions="FillAndExpand" Command="{Binding State2Command}"/>        
+            <Button Text="All Min" Grid.Column="2" HorizontalOptions="FillAndExpand" Command="{Binding State3Command}"/>        
         </Grid>
         
         <!-- Items in Cart -->
-        <ListView ItemsSource="{Binding Cart}" RowHeight="150">
+        <ListView ItemsSource="{Binding Cart}" RowHeight="80">
             <ListView.ItemTemplate>
                <DataTemplate>
                     <ViewCell>
-                        <StackLayout Orientation="Horizontal" HorizontalOptions="Fill" >
-                            <StackLayout Orientation="Vertical">
-                                <Label Text = "{Binding Description}" FontSize="24" />
-                                <Label Text = "{Binding Quantity}" />
-                                <Label Text = "{Binding UnitPrice}" />
-                                <Label Text = "{Binding Discount}" />
-                                <Label Text = "{Binding TotalPrice}" />
-                            </StackLayout>
-                        </StackLayout>
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Label Text = "{Binding Description}" FontSize="24" 
+                                   Grid.Row="0" Grid.Column="0"/>
+                            <Label Text = "{Binding StateLabel}"
+                                   VerticalTextAlignment="Center"
+                                   Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+                            <Label Text = "{Binding TotalPrice, StringFormat='{0:C}'}" 
+                                   FontSize="24" VerticalTextAlignment="Center"
+                                   Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"/> 
+                        </Grid>
+       
                     </ViewCell>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -51,7 +64,9 @@
                Text="{Binding CartTotalOveride, Converter={StaticResource DecimalConverter}}"
                HorizontalOptions="EndAndExpand" FontSize="20" 
                IsVisible="{Binding IsEditingTotal, Mode=OneWay}"/>
-        <Button Text="Discount Total" Command="{Binding SetDiscountCommand}"/>
-
+        <Button Text="Discount Total" Command="{Binding EditDiscountCommand}" 
+                IsVisible="{Binding IsEditingTotal, Converter={StaticResource BooleanConverter}, Mode=OneWay}" />
+        <Button Text="Confirm New Total" Command="{Binding SetDiscountCommand}"
+                IsVisible="{Binding IsEditingTotal, Mode=OneWay}" />
     </StackLayout>
 </ContentPage>

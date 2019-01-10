@@ -21,7 +21,7 @@ namespace POS.ViewModels
         public ICommand State3Command { get; }
 
         public ICommand SetDiscountCommand { get; }
-
+        public ICommand EditDiscountCommand { get; }
 
         public BindingList<SaleItemViewModel> Cart { get; }
         public decimal CartTotal => Cart.Sum(item => item.TotalPrice);
@@ -35,9 +35,7 @@ namespace POS.ViewModels
             {
                 if (SetProperty(ref _cartTotalOverride, value))
                 {
-                    DiscountEngine.Discount((IList<ISaleItem>) Cart, 
-                                            ProductDataStore.GetItemsAsync().Result.ToList(),
-                                            CartTotal, value);
+
                 }
             }
         }
@@ -57,28 +55,42 @@ namespace POS.ViewModels
             foreach (var item in TransactionDataStore.GetItemsAsync().Result)
                 Cart.Add(new SaleItemViewModel(item));
 
-            State1Command = new Command(async () =>
+            State1Command = new Command(() =>
             {
                 ((MockProductDataStore)ProductDataStore).Init(MockProductDataStore.CreateNoMinimumsProducts());
-                NotifyPropertyChanged(() => CartTotal);
+                UpdateDiscounts();
             });
 
-            State2Command = new Command(async () =>
+            State2Command = new Command(() =>
             {
-                ((MockProductDataStore)ProductDataStore).Init(MockProductDataStore.CreateNoMinimumsProducts());
+                ((MockProductDataStore)ProductDataStore).Init(MockProductDataStore.CreateSimpleMinimumsProducts());
+                UpdateDiscounts();
             });
 
-            State3Command = new Command(async () =>
+            State3Command = new Command(() =>
             {
-                ((MockProductDataStore)ProductDataStore).Init(MockProductDataStore.CreateNoMinimumsProducts());
+                ((MockProductDataStore)ProductDataStore).Init(MockProductDataStore.CreateAllMinimumsProducts());
+                UpdateDiscounts();
             });
 
             SetDiscountCommand = new Command(() =>
             {
+                IsEditingTotal = false;
+                UpdateDiscounts();
+            });
+            EditDiscountCommand = new Command(() =>
+            {
                 IsEditingTotal = true;
-                if (CartTotalOveride == 0)
-                   CartTotalOveride = CartTotal;
-            }, () => !IsEditingTotal);
+                CartTotalOveride = CartTotal;
+            });
+        }
+
+        private void UpdateDiscounts()
+        {
+            DiscountEngine.Discount((IList<ISaleItem>)Cart,
+                        ProductDataStore.GetItemsAsync().Result.ToList(),
+                        CartTotalOveride);
+            NotifyPropertyChanged(() => CartTotal);
         }
     }
 }

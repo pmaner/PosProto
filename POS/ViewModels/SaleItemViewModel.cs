@@ -22,25 +22,31 @@ namespace POS.ViewModels
         public int Quantity
         {
             get { return _item.Quantity; }
-            set { _item.Quantity = SetProperty(_item.Quantity, value, () => Quantity, () => TotalPrice); }
+            set { _item.Quantity = SetProperty(_item.Quantity, value, () => Quantity, () => TotalPrice, () => StateLabel); }
         }
 
         public decimal UnitPrice
         {
             get { return _item.UnitPrice; }
-            set { _item.UnitPrice = SetProperty(_item.UnitPrice, value, () => UnitPrice, () => TotalPrice); }
+            set { _item.UnitPrice = SetProperty(_item.UnitPrice, value, () => UnitPrice, () => TotalPrice, () => StateLabel); }
         }
 
         public decimal Discount
         {
             get { return _item.Discount; }
-            set { _item.Discount = SetProperty(_item.Discount, value, () => Discount, () => TotalPrice); }
+            set { _item.Discount = SetProperty(_item.Discount, value, () => Discount, () => TotalPrice, () => StateLabel); }
         }
 
         public decimal TotalPrice
         {
             get { return _item.TotalPrice; }
         }
+
+
+        public string StateLabel => (Discount == 0M) ? $"{Quantity} x {UnitPrice:C}"
+                                                     : $"{Quantity} x {UnitPrice:C} with {Discount:C} discount";
+
+
 
         public SaleItemViewModel(ISaleItem item)
         {
