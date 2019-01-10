@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core" 
+             ios:Page.UseSafeArea="true"
+             xmlns:local="clr-namespace:POS.Views" x:Class="POS.Views.CheckOutPage">
+
+    <StackLayout Orientation="Vertical" Margin="10,10,10,10">
+
+
+        <Label Text="POS" HorizontalOptions="Center" FontSize="20"/>
+        <Label Text="Prototype" HorizontalOptions="Center" FontSize="20"/>
+        
+        
+        <Grid ColumnSpacing="8" HorizontalOptions="FillAndExpand">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Button Text="State 1" Grid.Column="0" HorizontalOptions="FillAndExpand" Command="{Binding State1Command}"/>
+            <Button Text="State 2" Grid.Column="1" HorizontalOptions="FillAndExpand" Command="{Binding State2Command}"/>
+            <Button Text="State 3" Grid.Column="2" HorizontalOptions="FillAndExpand" Command="{Binding State3Command}"/>          
+        </Grid>
+        
+        <!-- Items in Cart -->
+        <ListView ItemsSource="{Binding Cart}" RowHeight="150">
+            <ListView.ItemTemplate>
+               <DataTemplate>
+                    <ViewCell>
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="Fill" >
+                            <StackLayout Orientation="Vertical">
+                                <Label Text = "{Binding Description}" FontSize="24" />
+                                <Label Text = "{Binding Quantity}" />
+                                <Label Text = "{Binding UnitPrice}" />
+                                <Label Text = "{Binding Discount}" />
+                                <Label Text = "{Binding TotalPrice}" />
+                            </StackLayout>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+        <Label Text="Total" HorizontalOptions="EndAndExpand" FontSize="20"/>
+        <Label Text="{Binding CartTotal, StringFormat='${0}'}" 
+               HorizontalOptions="EndAndExpand" FontSize="20" 
+               IsVisible="{Binding IsEditingTotal, Converter={StaticResource BooleanConverter}, Mode=OneWay}" />
+       
+        <Entry Placeholder="Desired Total" Keyboard="Numeric" 
+               Text="{Binding CartTotalOveride, Converter={StaticResource DecimalConverter}}"
+               HorizontalOptions="EndAndExpand" FontSize="20" 
+               IsVisible="{Binding IsEditingTotal, Mode=OneWay}"/>
+        <Button Text="Discount Total" Command="{Binding SetDiscountCommand}"/>
+
+    </StackLayout>
+</ContentPage>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             xmlns:converters="clr-namespace:POS.Converters"  
+             x:Class="POS.App">
+ <Application.Resources>
+        <ResourceDictionary>
+            <!-- CONVERTERS -->
+            <converters:InverseBooleanConverter x:Key="BooleanConverter" />
+            <converters:DecimalConverter x:Key="DecimalConverter" />            
+       
+            
+            <Style x:Key="POSButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="#9F6F6F6F" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="FontAttributes" Value="Bold" />
+      
+                <Setter Property="FontSize">
+                    <Setter.Value>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="16"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="WidthRequest">
+                    <Setter.Value>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="270" Tablet="320"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="HeightRequest">
+                    <Setter.Value>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="35" Tablet="50"/>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="HorizontalOptions" Value="Center" />
+
+                <Setter Property="BorderRadius">
+                    <Setter.Value>
+                        <OnIdiom x:TypeArguments="x:Int32" Phone="15" Tablet="25"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
