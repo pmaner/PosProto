@@ -1,7 +1,8 @@
 # PosProto
 
 Just tested on android and iOS phone simulators
-No provisioning profile so you can’t install it on you actual phones unless you add one
+No provisioning profile so you can’t install it on you actual phones unless you add one.
+This was created on Visual Studio for Mac, I am not sure how well it will go if you just load into the PC.
 
 The interface is very basic, you can set if the minimums are configured for 
 - nothing (“No Mins”) 
